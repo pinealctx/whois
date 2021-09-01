@@ -13,7 +13,7 @@ func (r *WhoIsRunner) SetMobileUID(_ context.Context, req *pb.ReqMobileUID) (*pb
 	if err != nil {
 		return nil, err
 	}
-	r.inner.updateMobileInUser(req.UserID, *mk)
+	r.inner.updateMobileInUser(req.UserID, mk)
 	return r.getUserInfo(req.UserID)
 }
 

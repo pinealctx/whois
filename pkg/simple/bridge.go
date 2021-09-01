@@ -17,13 +17,12 @@ func UserCaToRsp(uc *UCaItem) *pb.RspUserInfo {
 	var rsp = &pb.RspUserInfo{
 		User: u,
 	}
-
-	var l = len(uc.Mobiles)
-	if l > 0 {
-		rsp.Mobiles = make([]*pb.RspMobile, l)
-		for i := 0; i < l; i++ {
-			rsp.Mobiles[i] = &pb.RspMobile{}
-			rsp.Mobiles[i].Mobile, rsp.Mobiles[i].Area = uc.Mobiles[i].Mobile, uc.Mobiles[i].Area
+	if uc.Mob == nil {
+		rsp.Mob = nil
+	} else {
+		rsp.Mob = &pb.RspMobile{
+			Mobile: uc.Mob.Mobile,
+			Area:   uc.Mob.Area,
 		}
 	}
 

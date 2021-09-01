@@ -15,8 +15,8 @@ type WeStore interface {
 	AddOpenInfo(wf *model.WechatInfo, now time.Time) error
 	AddMiniAppInfo(wf *model.WechatInfo, now time.Time) error
 
-	BindOpenUserID(wk *model.WeChatKey, userID int32, now time.Time) error
-	BindMiniAppUserID(wk *model.WeChatKey, userID int32, now time.Time) error
+	BindOpenUserID(wk *model.WeChatKey, uid int32, now time.Time) error
+	BindMiniAppUserID(wk *model.WeChatKey, uid int32, now time.Time) error
 
 	IsNotFoundErr(err error) bool
 }

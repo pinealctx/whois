@@ -19,8 +19,8 @@ func UpdateUWechatOpenInfo(db *gorm.DB, w *WechatInfo, now time.Time) error {
 }
 
 //UpdateUWechatOpenUID : update user id of we chat open info
-func UpdateUWechatOpenUID(db *gorm.DB, openID, appID string, userID int32, now time.Time) error {
-	return updateUWechatUID(db, uWechatOpenTableName, openID, appID, userID, now)
+func UpdateUWechatOpenUID(db *gorm.DB, openID, appID string, uid int32, now time.Time) error {
+	return updateUWechatUID(db, uWechatOpenTableName, openID, appID, uid, now)
 }
 
 //GetByWechatOpen : get we chat open info
@@ -41,8 +41,8 @@ func UpdateUWechatMiniAppInfo(db *gorm.DB, w *WechatInfo, now time.Time) error {
 }
 
 //UpdateUWechatMiniAppUID : update user id of we chat mini app info
-func UpdateUWechatMiniAppUID(db *gorm.DB, openID, appID string, userID int32, now time.Time) error {
-	return updateUWechatUID(db, uWechatMiniAppTableName, openID, appID, userID, now)
+func UpdateUWechatMiniAppUID(db *gorm.DB, openID, appID string, uid int32, now time.Time) error {
+	return updateUWechatUID(db, uWechatMiniAppTableName, openID, appID, uid, now)
 }
 
 //GetByWechatMiniApp : get we chat mini app info
@@ -76,10 +76,10 @@ func updateUWechatInfo(db *gorm.DB, tableName string, w *WechatInfo, now time.Ti
 }
 
 //updateWechatUID : update user we chat related user id
-func updateUWechatUID(db *gorm.DB, tableName string, openID, appID string, userID int32, now time.Time) error {
+func updateUWechatUID(db *gorm.DB, tableName string, openID, appID string, uid int32, now time.Time) error {
 	return db.Table(tableName).Where("`open_id` = ? AND `app_id` = ?", openID, appID).Updates(
 		map[string]interface{}{
-			"user_id":    userID,
+			"user_id":    uid,
 			"updated_at": now,
 		}).Error
 }

@@ -13,7 +13,7 @@ var (
 
 type UCaItem struct {
 	UserMod *model.User
-	Mobiles []model.MobileInfo
+	Mob     *model.MobileInfo
 }
 
 func (u *UCaItem) Size() int {
@@ -55,7 +55,7 @@ func (w *WhoIsSimple) getUserInfo(uid int32) (*UCaItem, error) {
 
 //add user info
 func (w *WhoIsSimple) addUserInfo(uid int32, nick, avatar string,
-	mob model.MobileInfo, now time.Time) (*UCaItem, error) {
+	mob *model.MobileInfo, now time.Time) (*UCaItem, error) {
 	var _, exist = w.userCa.Peek(uid)
 	if exist {
 		return nil, ErrUserExist
@@ -80,9 +80,7 @@ func (w *WhoIsSimple) addUserInfo(uid int32, nick, avatar string,
 			CreatedAt: now,
 			UpdatedAt: now,
 		},
-		Mobiles: []model.MobileInfo{
-			mob,
-		},
+		Mob: mob,
 	}
 	w.userCa.Set(uid, uc)
 	return uc, nil
@@ -141,7 +139,7 @@ func (w *WhoIsSimple) updateAvatar(uid int32, avatar string, now time.Time) (*UC
 }
 
 //add user info
-func (w *WhoIsSimple) updateMobileInUser(uid int32, mob model.MobileInfo) {
+func (w *WhoIsSimple) updateMobileInUser(uid int32, mob *model.MobileInfo) {
 	var loadLock = w.loadUserDocker.GetLock(uid)
 	loadLock.Lock()
 	defer loadLock.Unlock()
@@ -152,7 +150,7 @@ func (w *WhoIsSimple) updateMobileInUser(uid int32, mob model.MobileInfo) {
 		return
 	}
 	var nw = cloneUCaItem(pre.(*UCaItem))
-	nw.Mobiles = []model.MobileInfo{mob}
+	nw.Mob = mob
 	w.userCa.Set(uid, nw)
 }
 
@@ -173,10 +171,17 @@ func (w *WhoIsSimple) loadUserAndMobiles(uid int32) (*UCaItem, error) {
 		return nil, err
 	}
 
-	return &UCaItem{
+	var uc = &UCaItem{
 		UserMod: u,
-		Mobiles: mbs,
-	}, nil
+	}
+	if len(mbs) > 0 {
+		uc.Mob = &model.MobileInfo{
+			Area:   mbs[0].Area,
+			Mobile: mbs[0].Mobile,
+		}
+	}
+
+	return uc, nil
 }
 
 //clone user cache item
@@ -184,9 +189,9 @@ func cloneUCaItem(o *UCaItem) *UCaItem {
 	//use new memory
 	var un = &UCaItem{
 		UserMod: &model.User{},
-		Mobiles: make([]model.MobileInfo, len(o.Mobiles)),
+		Mob:     &model.MobileInfo{},
 	}
 	*un.UserMod = *o.UserMod
-	copy(un.Mobiles, o.Mobiles)
+	*un.Mob = *o.Mob
 	return un
 }

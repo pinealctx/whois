@@ -125,7 +125,7 @@ func (r *WhoIsRunner) addUserWithMobile(mk *model.MobileInfo, nick, avatar strin
 	//add uid, then bind it
 	var now = time.Now()
 	var uid = r.inner.uidGen.Next()
-	var nu, err = r.inner.addUserInfo(uid, nick, avatar, *mk, now)
+	var nu, err = r.inner.addUserInfo(uid, nick, avatar, mk, now)
 	if err != nil {
 		return nil, err
 	}

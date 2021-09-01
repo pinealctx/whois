@@ -40,10 +40,10 @@ func (g GormWeStore) AddMiniAppInfo(wf *model.WechatInfo, now time.Time) error {
 	return model.AddUWechatMiniAppNoUID(g.db, wf, now)
 }
 
-func (g GormWeStore) BindOpenUserID(wk *model.WeChatKey, userID int32, now time.Time) error {
-	return model.UpdateUWechatOpenUID(g.db, wk.OpenID, wk.AppID, userID, now)
+func (g GormWeStore) BindOpenUserID(wk *model.WeChatKey, uid int32, now time.Time) error {
+	return model.UpdateUWechatOpenUID(g.db, wk.OpenID, wk.AppID, uid, now)
 }
 
-func (g GormWeStore) BindMiniAppUserID(wk *model.WeChatKey, userID int32, now time.Time) error {
-	return model.UpdateUWechatMiniAppUID(g.db, wk.OpenID, wk.AppID, userID, now)
+func (g GormWeStore) BindMiniAppUserID(wk *model.WeChatKey, uid int32, now time.Time) error {
+	return model.UpdateUWechatMiniAppUID(g.db, wk.OpenID, wk.AppID, uid, now)
 }

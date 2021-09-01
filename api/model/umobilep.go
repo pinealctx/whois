@@ -15,11 +15,11 @@ const (
 )
 
 //AddUMobile : add user mobile
-func AddUMobile(db *gorm.DB, area, mobile string, userID int32, now time.Time) error {
+func AddUMobile(db *gorm.DB, area, mobile string, uid int32, now time.Time) error {
 	var um = &UMobile{
 		Mobile:    mobile,
 		Area:      area,
-		UserID:    userID,
+		UserID:    uid,
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
@@ -48,11 +48,11 @@ func GetByMobile(db *gorm.DB, area, mobile string, forUpdate bool) (*UMobile, er
 	return &u, nil
 }
 
-//GetMobilesByUID : get user mobile list by user id
-func GetMobilesByUID(db *gorm.DB, userID int32) ([]UMobile, error) {
+//GetUpdDescMobilesByUID : get user mobile list by user id
+func GetUpdDescMobilesByUID(db *gorm.DB, uid int32) ([]UMobile, error) {
 	var us []UMobile
-	var err = db.Table(uMobileTableName).
-		Where("`user_id` = ?", userID).Find(&us).Error
+	var err = db.Table(uMobileTableName).Order("updated_at desc").
+		Where("`user_id` = ?", uid).Find(&us).Error
 	if err != nil {
 		return nil, err
 	}

@@ -91,7 +91,7 @@ message RspMobile {
 
 message RspUserInfo {
   RspUser user = 1;
-  repeated RspMobile mobiles = 2;
+ RspMobile mob = 2;
 }
 
 //UserMod : for front service usage

@@ -21,7 +21,7 @@ func (g GormUStore) LoadUser(uid int32) (*model.User, error) {
 }
 
 func (g GormUStore) LoadUserMobiles(uid int32) ([]model.MobileInfo, error) {
-	var mobs, err = model.GetMobilesByUID(g.db, uid)
+	var mobs, err = model.GetUpdDescMobilesByUID(g.db, uid)
 	if err != nil {
 		return nil, err
 	}
