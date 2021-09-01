@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+option go_package = "github.com/pinealctx/whois/api/pb";
+
+package github.com.pinealctx.whois.api.pb;
+
+/*---------basic request information----------*/
+
+//ReqMobile : mobile info and time
+message ReqMobile {
+  string mobile = 1;
+  string area = 2;
+  int64 now = 3;
+}
+
+//ReqWechat : wechat info and time
+message ReqWechat {
+  string openID = 1;
+  string appID = 2;
+
+  string nick_name = 3;
+  string country = 4;
+  string province = 5;
+  string city = 6;
+  string head_img_url = 7;
+
+  int32 sex = 8;
+  int64 now = 9;
+}
+
+//ReqWechatBindMobile : bind wechat info and mobile
+message ReqWechatBindMobile {
+  string mobile = 1;
+  string area = 2;
+
+  string openID = 3;
+  string appID = 4;
+
+  int64 now = 5;
+}
+
+//ReqMobileUID : set user_id of mobile
+message ReqMobileUID {
+  string mobile = 1;
+  string area = 2;
+  int32 userID = 3;
+  int64 now = 4;
+}
+
+//ReqNickname : update nick name
+message ReqNickname {
+  int32 userID = 1;
+  string nick_name = 2;
+  int64 now = 3;
+}
+
+//ReqAvatar : update avatar
+message ReqAvatar {
+  int32 userID = 1;
+  string avatar = 2;
+  int64 now = 3;
+}
+
+//ReqUserKey : user key
+message ReqUserKey {
+  int32 userID = 1;
+}
+
+//ReqMobileKey : mobile key
+message ReqMobileKey {
+  string mobile = 1;
+  string area = 2;
+}
+
+/*---------basic response information---------*/
+
+message RspUser {
+  int32 ID = 1;
+  int32 state = 2;
+  string nick_name = 3;
+  string avatar = 4;
+
+  int64 created_at = 5;
+  int64 updated_at = 6;
+}
+
+message RspMobile {
+  string mobile = 1;
+  string area = 2;
+}
+
+message RspUserInfo {
+  RspUser user = 1;
+  repeated RspMobile mobiles = 2;
+}
+
+//UserMod : for front service usage
+service UserMod {
+
+  //SignInByMobile : login or register by mobile
+  rpc SignInByMobile(ReqMobile) returns (RspUserInfo);
+  //SignInByWechatOpen : login or register by wechat open
+  rpc SignInByWechatOpen(ReqWechat) returns (RspUserInfo);
+  //SignInByWechatMiniApp : login or register by wechat mini app
+  rpc SignInByWechatMiniApp(ReqWechat) returns (RspUserInfo);
+
+  //BindMobileByWechatOpen : bind mobile by wechat open
+  rpc BindMobileByWechatOpen(ReqWechatBindMobile) returns (RspUserInfo);
+  //BindMobileByWechatMiniApp : bind mobile by wechat mini app
+  rpc BindMobileByWechatMiniApp(ReqWechatBindMobile) returns (RspUserInfo);
+
+  //UpdateNickname : update user nick name
+  rpc UpdateNickname(ReqNickname) returns(RspUserInfo);
+  //UpdateAvatar : update user avatar
+  rpc UpdateAvatar(ReqAvatar) returns(RspUserInfo);
+
+}
+
+//UserAdmin : for back service usage
+service UserAdmin {
+  //SetMobileUID : set user id of mobile
+  rpc SetMobileUID(ReqMobileUID) returns (RspUserInfo);
+
+  //GetUserInfoByID : get user info by user id
+  rpc GetUserInfoByID(ReqUserKey) returns (RspUserInfo);
+  //GetUserInfoByMobile : get user info by mobile
+  rpc GetUserInfoByMobile(ReqMobileKey) returns (RspUserInfo);
+
+}
