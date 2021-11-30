@@ -23,9 +23,9 @@ func (w *WhoIsSimple) getMobileInfo(m *model.MobileInfo) (*model.UMobile, error)
 		return r.(*model.UMobile), nil
 	}
 
-	var loadLock = w.loadMobDocker.GetLock(key)
-	loadLock.Lock()
-	defer loadLock.Unlock()
+	var loadLock = w.loadMobDocker
+	loadLock.Lock(key)
+	defer loadLock.Unlock(key)
 
 	//retry -- cause other go routine can figure out
 	r, ok = w.mobCa.Get(key)
@@ -49,9 +49,9 @@ func (w *WhoIsSimple) addMobileInfo(m *model.MobileInfo, uid int32, now time.Tim
 		return nil, ErrMobileExist
 	}
 
-	var loadLock = w.loadMobDocker.GetLock(key)
-	loadLock.Lock()
-	defer loadLock.Unlock()
+	var loadLock = w.loadMobDocker
+	loadLock.Lock(key)
+	defer loadLock.Unlock(key)
 
 	var err = w.mobStore.AddMobile(m, uid, now)
 	if err != nil {
@@ -68,9 +68,9 @@ func (w *WhoIsSimple) addMobileInfo(m *model.MobileInfo, uid int32, now time.Tim
 //upsert mobile user id
 func (w *WhoIsSimple) upsertMobileUID(m *model.MobileInfo, uid int32, now time.Time) (*model.UMobile, error) {
 	var key = m.Key()
-	var loadLock = w.loadMobDocker.GetLock(key)
-	loadLock.Lock()
-	defer loadLock.Unlock()
+	var loadLock = w.loadMobDocker
+	loadLock.Lock(key)
+	defer loadLock.Unlock(key)
 
 	var err = w.mobStore.UpsertMobileUID(m, uid, now)
 	if err != nil {

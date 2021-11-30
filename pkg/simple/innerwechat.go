@@ -2,7 +2,7 @@ package simple
 
 import (
 	"github.com/pinealctx/neptune/cache"
-	"github.com/pinealctx/neptune/lock"
+	"github.com/pinealctx/neptune/syncx/keylock"
 	"github.com/pinealctx/whois/api/model"
 	"time"
 )
@@ -10,19 +10,18 @@ import (
 //setup we chat user id
 func (w *WhoIsSimple) setWeUID(wk *model.WeChatKey, uid int32, now time.Time, isOpen bool) (*model.UWechat, error) {
 	var (
-		updLockDocker *lock.SimpleLockDocker
-		key           = wk.Key()
+		updLock *keylock.KeyLocker
+		key     = wk.Key()
 	)
 
 	if isOpen {
-		updLockDocker = w.updWeOpenDocker
+		updLock = w.updWeOpenDocker
 	} else {
-		updLockDocker = w.updWeMiniAppDocker
+		updLock = w.updWeMiniAppDocker
 	}
 
-	var updLock = updLockDocker.GetLock(key)
-	updLock.Lock()
-	defer updLock.Unlock()
+	updLock.Lock(key)
+	defer updLock.Unlock(key)
 
 	var pre, err = w.getWeInfo(wk, isOpen)
 	if err != nil {
@@ -35,19 +34,18 @@ func (w *WhoIsSimple) setWeUID(wk *model.WeChatKey, uid int32, now time.Time, is
 func (w *WhoIsSimple) upsertWeInfo(wf *model.WechatInfo, now time.Time, isOpen bool) (*model.UWechat, error) {
 
 	var (
-		updLockDocker *lock.SimpleLockDocker
-		key           = wf.Key()
+		updLock *keylock.KeyLocker
+		key     = wf.Key()
 	)
 
 	if isOpen {
-		updLockDocker = w.updWeOpenDocker
+		updLock = w.updWeOpenDocker
 	} else {
-		updLockDocker = w.updWeMiniAppDocker
+		updLock = w.updWeMiniAppDocker
 	}
 
-	var updLock = updLockDocker.GetLock(key)
-	updLock.Lock()
-	defer updLock.Unlock()
+	updLock.Lock(key)
+	defer updLock.Unlock(key)
 
 	var wk = wf.WeKey()
 	var pre, err = w.getWeInfo(wk, isOpen)
@@ -67,19 +65,19 @@ func (w *WhoIsSimple) upsertWeInfo(wf *model.WechatInfo, now time.Time, isOpen b
 //get wechat info
 func (w *WhoIsSimple) getWeInfo(wk *model.WeChatKey, isOpen bool) (*model.UWechat, error) {
 	var (
-		r              interface{}
-		ok             bool
-		loadLockDocker *lock.SimpleLockDocker
-		ca             *cache.LRUCache
-		fn             func(weKey *model.WeChatKey) (*model.UWechat, error)
+		r        interface{}
+		ok       bool
+		loadLock *keylock.KeyLocker
+		ca       *cache.LRUCache
+		fn       func(weKey *model.WeChatKey) (*model.UWechat, error)
 	)
 
 	if isOpen {
-		loadLockDocker = w.loadWeOpenDocker
+		loadLock = w.loadWeOpenDocker
 		ca = w.weOpenCa
 		fn = w.weStore.LoadOpenInfo
 	} else {
-		loadLockDocker = w.loadWeMiniAppDocker
+		loadLock = w.loadWeMiniAppDocker
 		ca = w.weMiniAppCa
 		fn = w.weStore.LoadMiniAppInfo
 	}
@@ -90,9 +88,8 @@ func (w *WhoIsSimple) getWeInfo(wk *model.WeChatKey, isOpen bool) (*model.UWecha
 		return r.(*model.UWechat), nil
 	}
 
-	var loadLock = loadLockDocker.GetLock(key)
-	loadLock.Lock()
-	defer loadLock.Unlock()
+	loadLock.Lock(key)
+	defer loadLock.Unlock(key)
 
 	//retry -- cause other go routine can figure out
 	r, ok = ca.Get(key)
@@ -111,23 +108,22 @@ func (w *WhoIsSimple) getWeInfo(wk *model.WeChatKey, isOpen bool) (*model.UWecha
 //add we chat info
 func (w *WhoIsSimple) addWeInfo(key string, wf *model.WechatInfo, now time.Time, isOpen bool) (*model.UWechat, error) {
 	var (
-		loadLockDocker *lock.SimpleLockDocker
-		addFn          func(*model.WechatInfo, time.Time) error
-		ca             *cache.LRUCache
+		loadLock *keylock.KeyLocker
+		addFn    func(*model.WechatInfo, time.Time) error
+		ca       *cache.LRUCache
 	)
 	if isOpen {
-		loadLockDocker = w.loadWeOpenDocker
+		loadLock = w.loadWeOpenDocker
 		addFn = w.weStore.AddOpenInfo
 		ca = w.weOpenCa
 	} else {
-		loadLockDocker = w.loadWeMiniAppDocker
+		loadLock = w.loadWeMiniAppDocker
 		addFn = w.weStore.AddMiniAppInfo
 		ca = w.weMiniAppCa
 	}
 
-	var loadLock = loadLockDocker.GetLock(key)
-	loadLock.Lock()
-	defer loadLock.Unlock()
+	loadLock.Lock(key)
+	defer loadLock.Unlock(key)
 
 	var err = addFn(wf, now)
 	if err != nil {

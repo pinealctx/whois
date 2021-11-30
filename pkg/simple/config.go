@@ -1,7 +1,7 @@
 package simple
 
 import (
-	"github.com/pinealctx/neptune/tex"
+	"github.com/pinealctx/neptune/jsonx"
 	"github.com/pinealctx/neptune/ulog"
 	"go.uber.org/zap"
 )
@@ -53,7 +53,7 @@ func LoadCnf(fName string) *Config {
 		return defaultCnf
 	}
 	var c Config
-	var err = tex.LoadJSONFile2Obj(fName, &c)
+	var err = jsonx.LoadJSONFile2Obj(fName, &c)
 	if err != nil {
 		ulog.Error("load.whois.simple.config",
 			zap.String("fileName", fName),

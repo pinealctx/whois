@@ -2,7 +2,7 @@ package simple
 
 import (
 	"github.com/pinealctx/neptune/cache"
-	"github.com/pinealctx/neptune/lock"
+	"github.com/pinealctx/neptune/syncx/keylock"
 	"github.com/pinealctx/whois/pkg/store"
 	"github.com/pinealctx/whois/pkg/uid"
 )
@@ -24,15 +24,15 @@ type WhoIsSimple struct {
 	mobStore store.MobileStore
 
 	//load data locker map
-	loadMobDocker       *lock.SimpleLockDocker
-	loadUserDocker      *lock.SimpleLockDocker
-	loadWeOpenDocker    *lock.SimpleLockDocker
-	loadWeMiniAppDocker *lock.SimpleLockDocker
+	loadMobDocker       *keylock.KeyLocker
+	loadUserDocker      *keylock.KeyLocker
+	loadWeOpenDocker    *keylock.KeyLocker
+	loadWeMiniAppDocker *keylock.KeyLocker
 	//update data locker map
-	updMobDocker       *lock.SimpleLockDocker
-	updUserDocker      *lock.SimpleLockDocker
-	updWeOpenDocker    *lock.SimpleLockDocker
-	updWeMiniAppDocker *lock.SimpleLockDocker
+	updMobDocker       *keylock.KeyLocker
+	updUserDocker      *keylock.KeyLocker
+	updWeOpenDocker    *keylock.KeyLocker
+	updWeMiniAppDocker *keylock.KeyLocker
 }
 
 func NewWhoIsSimple(c *Config,
@@ -47,14 +47,14 @@ func NewWhoIsSimple(c *Config,
 	w.uidGen = ug
 	w.weStore, w.uStore, w.mobStore = ws, us, mbs
 
-	w.loadMobDocker = lock.NewSimpleLockDocker()
-	w.loadUserDocker = lock.NewSimpleLockDocker()
-	w.loadWeOpenDocker = lock.NewSimpleLockDocker()
-	w.loadWeMiniAppDocker = lock.NewSimpleLockDocker()
+	w.loadMobDocker = keylock.NewKeyLocker()
+	w.loadUserDocker = keylock.NewKeyLocker()
+	w.loadWeOpenDocker = keylock.NewKeyLocker()
+	w.loadWeMiniAppDocker = keylock.NewKeyLocker()
 
-	w.updMobDocker = lock.NewSimpleLockDocker()
-	w.updUserDocker = lock.NewSimpleLockDocker()
-	w.updWeOpenDocker = lock.NewSimpleLockDocker()
-	w.updWeMiniAppDocker = lock.NewSimpleLockDocker()
+	w.updMobDocker = keylock.NewKeyLocker()
+	w.updUserDocker = keylock.NewKeyLocker()
+	w.updWeOpenDocker = keylock.NewKeyLocker()
+	w.updWeMiniAppDocker = keylock.NewKeyLocker()
 	return w
 }

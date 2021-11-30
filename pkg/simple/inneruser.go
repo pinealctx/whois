@@ -34,9 +34,9 @@ func (w *WhoIsSimple) getUserInfo(uid int32) (*UCaItem, error) {
 		return r.(*UCaItem), nil
 	}
 
-	var loadLock = w.loadUserDocker.GetLock(uid)
-	loadLock.Lock()
-	defer loadLock.Unlock()
+	var loadLock = w.loadUserDocker
+	loadLock.Lock(uid)
+	defer loadLock.Unlock(uid)
 
 	//retry -- cause other go routine can figure out
 	r, ok = w.userCa.Get(uid)
@@ -61,9 +61,9 @@ func (w *WhoIsSimple) addUserInfo(uid int32, nick, avatar string,
 		return nil, ErrUserExist
 	}
 
-	var loadLock = w.loadUserDocker.GetLock(uid)
-	loadLock.Lock()
-	defer loadLock.Unlock()
+	var loadLock = w.loadUserDocker
+	loadLock.Lock(uid)
+	defer loadLock.Unlock(uid)
 
 	var err = w.uStore.AddUser(uid, nick, avatar, now)
 	if err != nil {
@@ -88,9 +88,9 @@ func (w *WhoIsSimple) addUserInfo(uid int32, nick, avatar string,
 
 //update nick
 func (w *WhoIsSimple) updateNick(uid int32, nick string, now time.Time) (*UCaItem, error) {
-	var updLock = w.updUserDocker.GetLock(uid)
-	updLock.Lock()
-	defer updLock.Unlock()
+	var updLock = w.updUserDocker
+	updLock.Lock(uid)
+	defer updLock.Unlock(uid)
 
 	var uc, err = w.getUserInfo(uid)
 	if err != nil {
@@ -114,9 +114,9 @@ func (w *WhoIsSimple) updateNick(uid int32, nick string, now time.Time) (*UCaIte
 
 //update nick
 func (w *WhoIsSimple) updateAvatar(uid int32, avatar string, now time.Time) (*UCaItem, error) {
-	var updLock = w.updUserDocker.GetLock(uid)
-	updLock.Lock()
-	defer updLock.Unlock()
+	var updLock = w.updUserDocker
+	updLock.Lock(uid)
+	defer updLock.Unlock(uid)
 
 	var uc, err = w.getUserInfo(uid)
 	if err != nil {
@@ -140,9 +140,9 @@ func (w *WhoIsSimple) updateAvatar(uid int32, avatar string, now time.Time) (*UC
 
 //add user info
 func (w *WhoIsSimple) updateMobileInUser(uid int32, mob *model.MobileInfo) {
-	var loadLock = w.loadUserDocker.GetLock(uid)
-	loadLock.Lock()
-	defer loadLock.Unlock()
+	var loadLock = w.loadUserDocker
+	loadLock.Lock(uid)
+	defer loadLock.Unlock(uid)
 
 	var pre, ok = w.userCa.Peek(uid)
 	if !ok {
